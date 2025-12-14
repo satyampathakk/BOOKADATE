@@ -27,6 +27,7 @@ security = HTTPBearer()
 # Service URLs - Configure these based on your setup
 SERVICE_URLS = {
     "user_service": "http://localhost:8000",
+    "faceauth_service": "http://localhost:8003"
     # Add other microservices here
     # "match_service": "http://localhost:8001",
     # "chat_service": "http://localhost:8002",
@@ -212,6 +213,7 @@ async def user_routes(path: str, request: Request):
         params=dict(request.query_params)
     )
 
+
 # ==================== EXAMPLE: OTHER SERVICE ROUTES ====================
 # Uncomment and modify these when you add more microservices
 
@@ -242,6 +244,25 @@ async def user_routes(path: str, request: Request):
 #         body=body,
 #         params=dict(request.query_params)
 #     )
+
+
+#adding faceauth routes in the gateway
+
+@app.api_route("/faceauth/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def faceauth_routes(path: str, request: Request):
+    body = await request.body() if request.method in ["POST", "PUT"] else None
+
+    return await forward_request(
+        service_url=SERVICE_URLS["faceauth_service"],
+        path=f"/faceauth/{path}",
+        method=request.method,
+        headers=dict(request.headers),
+        body=body,
+        params=dict(request.query_params)
+    )
+
+
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
