@@ -26,11 +26,11 @@ security = HTTPBearer()
 
 # Service URLs - Configure these based on your setup
 SERVICE_URLS = {
-    "user_service": "http://localhost:8000",
-    "faceauth_service": "http://localhost:8003"
-    # Add other microservices here
-    # "match_service": "http://localhost:8001",
-    # "chat_service": "http://localhost:8002",
+    "user_service": "http://localhost:8006",
+    "match_service": "http://localhost:8002",
+    "booking_service": "http://localhost:8003",
+    "venue_service": "http://localhost:8004",
+    "chat_service": "http://localhost:8001",
 }
 
 # Routes that don't require authentication
@@ -93,6 +93,10 @@ async def gateway_middleware(request: Request, call_next):
     if is_public_route(path):
         return await call_next(request)
     
+    # Allow CORS preflight requests (OPTIONS) without authentication
+    if request.method == "OPTIONS":
+        return await call_next(request)
+    
     # Check for Authorization header
     auth_header = request.headers.get("Authorization")
     
@@ -141,9 +145,14 @@ async def forward_request(
             content=body,
             params=params
         )
+
+        try:
+            payload = response.json() if response.text else {}
+        except ValueError:
+            payload = {"detail": response.text or "Upstream returned non-JSON"}
         
         return JSONResponse(
-            content=response.json() if response.text else {},
+            content=payload,
             status_code=response.status_code,
             headers=dict(response.headers)
         )
@@ -215,53 +224,66 @@ async def user_routes(path: str, request: Request):
 
 
 # ==================== EXAMPLE: OTHER SERVICE ROUTES ====================
-# Uncomment and modify these when you add more microservices
-
-# @app.api_route("/matches/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-# async def match_routes(path: str, request: Request):
-#     """Forward match requests to match service (requires authentication)"""
-#     body = await request.body() if request.method in ["POST", "PUT"] else None
-#     
-#     return await forward_request(
-#         service_url=SERVICE_URLS["match_service"],
-#         path=f"/matches/{path}",
-#         method=request.method,
-#         headers=dict(request.headers),
-#         body=body,
-#         params=dict(request.query_params)
-#     )
-
-# @app.api_route("/chats/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-# async def chat_routes(path: str, request: Request):
-#     """Forward chat requests to chat service (requires authentication)"""
-#     body = await request.body() if request.method in ["POST", "PUT"] else None
-#     
-#     return await forward_request(
-#         service_url=SERVICE_URLS["chat_service"],
-#         path=f"/chats/{path}",
-#         method=request.method,
-#         headers=dict(request.headers),
-#         body=body,
-#         params=dict(request.query_params)
-#     )
-
-
-#adding faceauth routes in the gateway
-
-@app.api_route("/faceauth/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def faceauth_routes(path: str, request: Request):
+@app.api_route("/matches/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def match_routes(path: str, request: Request):
+    """Forward match requests to matching service (requires authentication)"""
     body = await request.body() if request.method in ["POST", "PUT"] else None
-
     return await forward_request(
-        service_url=SERVICE_URLS["faceauth_service"],
-        path=f"/faceauth/{path}",
+        service_url=SERVICE_URLS["match_service"],
+        path=f"/matches/{path}",
         method=request.method,
         headers=dict(request.headers),
         body=body,
         params=dict(request.query_params)
     )
 
+@app.api_route("/bookings/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def booking_routes(path: str, request: Request):
+    body = await request.body() if request.method in ["POST", "PUT"] else None
+    return await forward_request(
+        service_url=SERVICE_URLS["booking_service"],
+        path=f"/bookings/{path}",
+        method=request.method,
+        headers=dict(request.headers),
+        body=body,
+        params=dict(request.query_params)
+    )
 
+@app.api_route("/venues/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def admin_routes(path: str, request: Request):
+    body = await request.body() if request.method in ["POST", "PUT"] else None
+    return await forward_request(
+        service_url=SERVICE_URLS["venue_service"],
+        path=f"/venues/{path}",
+        method=request.method,
+        headers=dict(request.headers),
+        body=body,
+        params=dict(request.query_params)
+    )
+
+@app.api_route("/chat/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def chat_routes(path: str, request: Request):
+    body = await request.body() if request.method in ["POST", "PUT"] else None
+    return await forward_request(
+        service_url=SERVICE_URLS["chat_service"],
+        path=f"/{path}",  # chat service defines /match and /sessions, keep root
+        method=request.method,
+        headers=dict(request.headers),
+        body=body,
+        params=dict(request.query_params)
+    )
+ 
+@app.api_route("/admin/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def admin_routes_user(path: str, request: Request):
+    body = await request.body() if request.method in ["POST", "PUT"] else None
+    return await forward_request(
+        service_url=SERVICE_URLS["user_service"],
+        path=f"/admin/{path}",
+        method=request.method,
+        headers=dict(request.headers),
+        body=body,
+        params=dict(request.query_params)
+    )
 
 
 @app.on_event("shutdown")
@@ -271,4 +293,4 @@ async def shutdown_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

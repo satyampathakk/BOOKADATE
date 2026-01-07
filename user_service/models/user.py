@@ -14,6 +14,10 @@ class User(Base):
     dob = Column(String)
     bio = Column(String, nullable=True)
     profile_photo = Column(String, nullable=True)
+    registration_status = Column(String, default="pending", index=True)
+    rejection_reason = Column(String, nullable=True)
+    id_document_path = Column(String, nullable=True)
+    selfie_path = Column(String, nullable=True)
     verified = Column(Boolean, default=False)
     kyc_level = Column(String, default="none")
     password_hash = Column(String, nullable=True)   # NEW: stores bcrypt hash

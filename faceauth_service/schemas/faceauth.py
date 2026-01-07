@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class FaceValidationOut(BaseModel):
@@ -7,6 +7,4 @@ class FaceValidationOut(BaseModel):
     is_validated: bool
     confidence: float
     created_at: datetime
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

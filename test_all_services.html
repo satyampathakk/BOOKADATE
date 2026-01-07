@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookADate - All Services Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 20px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .toolbar input[type="text"] {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .toolbar .status {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background: #eee;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section {
+            margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .output {
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .output pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+            margin-top: 15px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #dc3545;
+            margin-top: 15px;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+            margin-top: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-matched {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .api-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .api-status.healthy {
+            border-left: 4px solid #28a745;
+        }
+
+        .api-status.unhealthy {
+            border-left: 4px solid #dc3545;
+        }
+
+        .api-item {
+            padding: 5px 0;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .dot.green {
+            background: #28a745;
+        }
+
+        .dot.red {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="api-status" id="apiStatus">
+        <strong>API Status</strong>
+        <div class="api-item">
+            <span class="dot green" id="gatewayDot"></span>
+            <span>Gateway (8000)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="chatDot"></span>
+            <span>Chat (8001)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="matchingDot"></span>
+            <span>Matching (8002)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="bookingDot"></span>
+            <span>Booking (8003)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="adminDot"></span>
+            <span>Admin (8004)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="faceauthDot"></span>
+            <span>FaceAuth (8005)</span>
+        </div>
+        <div class="api-item">
+            <span class="dot green" id="userDot"></span>
+            <span>User (8006)</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎉 BookADate - Service Testing</h1>
+            <p>Complete Blind Dating Platform Microservices</p>
+        </div>
+
+        <div class="toolbar">
+            <label><input type="checkbox" id="useGatewayToggle"> Use Gateway (requires token)</label>
+            <span class="status" id="routingStatus">Routing: Direct to services</span>
+            <input type="text" id="tokenInput" placeholder="Paste Bearer token here">
+            <button class="btn-secondary" onclick="applyToken()">Apply Token</button>
+            <button class="btn-secondary" onclick="clearToken()">Clear</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event,'gateway')">Gateway</button>
+            <button class="tab-btn" onclick="switchTab(event,'chat')">Chat Service</button>
+            <button class="tab-btn" onclick="switchTab(event,'matching')">Matching Service</button>
+            <button class="tab-btn" onclick="switchTab(event,'booking')">Booking Service</button>
+            <button class="tab-btn" onclick="switchTab(event,'admin')">Admin Service</button>
+            <button class="tab-btn" onclick="switchTab(event,'faceauth')">Face Auth</button>
+            <button class="tab-btn" onclick="switchTab(event,'user')">User Service</button>
+        </div>
+
+        <!-- GATEWAY TAB -->
+        <div id="gateway" class="tab-content">
+            <div class="section">
+                <h3>🩺 Gateway Health</h3>
+                <button onclick="checkGatewayHealth()">Check /health</button>
+                <div id="gatewayHealthOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- CHAT SERVICE TAB -->
+        <div id="chat" class="tab-content">
+            <div class="section">
+                <h3>🔗 Create Chat Session</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>User 1 ID</label>
+                        <input type="text" id="chat_user1" placeholder="e.g., 101" value="101">
+                    </div>
+                    <div class="form-group">
+                        <label>User 2 ID</label>
+                        <input type="text" id="chat_user2" placeholder="e.g., 102" value="102">
+                    </div>
+                    <div class="form-group">
+                        <label>Meeting Time</label>
+                        <input type="datetime-local" id="chat_meeting_time">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="chat_duration" value="120">
+                </div>
+                <button onclick="createChatSession()">Create Session</button>
+                <div id="chatCreateOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🧭 Session Status</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Session ID</label>
+                        <input type="text" id="chat_session_id" placeholder="session id">
+                    </div>
+                </div>
+                <button onclick="getChatSession()">Get Session</button>
+                <div id="chatSessionOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>💬 WebSocket Chat</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Session ID</label>
+                        <input type="text" id="ws_session_id" placeholder="session id">
+                    </div>
+                    <div class="form-group">
+                        <label>Your User ID</label>
+                        <input type="text" id="ws_user_id" placeholder="e.g., 101" value="101">
+                    </div>
+                    <div class="form-group">
+                        <label>Connection</label>
+                        <button class="btn-secondary" onclick="connectWS()">Connect</button>
+                        <button class="btn-secondary" onclick="disconnectWS()">Disconnect</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Message</label>
+                        <input type="text" id="ws_message" placeholder="Type a message...">
+                    </div>
+                </div>
+                <button onclick="sendWSMessage()">Send</button>
+                <div id="wsOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- MATCHING SERVICE TAB -->
+        <div id="matching" class="tab-content active">
+            <div class="section">
+                <h3>📝 Create User Preferences</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="pref_user_id" placeholder="e.g., 101" value="101">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="pref_gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Seeking Gender</label>
+                        <select id="pref_seeking">
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Age Min</label>
+                        <input type="number" id="pref_age_min" placeholder="e.g., 20" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Age Max</label>
+                        <input type="number" id="pref_age_max" placeholder="e.g., 35" value="35">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Interests</label>
+                    <input type="text" id="pref_interests" placeholder="e.g., hiking, movies, cooking">
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea id="pref_bio" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <button onclick="createPreference()">Create Preference</button>
+                <div id="prefOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🔍 Find a Match</h3>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="number" id="match_user_id" placeholder="e.g., 101" value="101">
+                </div>
+                <button onclick="findMatch()">Find Match</button>
+                <div id="matchOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>👍 Approve/Reject Match</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Match ID</label>
+                        <input type="number" id="approve_match_id" placeholder="e.g., 1">
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="approve_user_id" placeholder="e.g., 101" value="101">
+                    </div>
+                </div>
+                <button onclick="approveMatch()">✅ Approve Match</button>
+                <button class="btn-secondary" onclick="rejectMatch()">❌ Reject Match</button>
+                <div id="approveOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Queue Status</h3>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="number" id="queue_user_id" placeholder="e.g., 101" value="101">
+                </div>
+                <button onclick="getQueueStatus()">Check Queue Status</button>
+                <div id="queueOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- BOOKING SERVICE TAB -->
+        <div id="booking" class="tab-content">
+            <div class="section">
+                <h3>📅 Create Booking</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Match ID</label>
+                        <input type="number" id="booking_match_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>User 1 ID</label>
+                        <input type="number" id="booking_user1_id" placeholder="e.g., 101" value="101">
+                    </div>
+                    <div class="form-group">
+                        <label>User 2 ID</label>
+                        <input type="number" id="booking_user2_id" placeholder="e.g., 102" value="102">
+                    </div>
+                </div>
+                <button onclick="createBooking()">Create Booking</button>
+                <div id="bookingCreateOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🏢 Propose Venue</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Booking ID</label>
+                        <input type="number" id="venue_booking_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Venue ID</label>
+                        <input type="number" id="venue_id" placeholder="e.g., 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="venue_user_id" placeholder="e.g., 101" value="101">
+                    </div>
+                </div>
+                <button onclick="proposeVenue()">Propose Venue</button>
+                <div id="venueOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>👀 View Other User's Proposal</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Booking ID</label>
+                        <input type="number" id="view_booking_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Your User ID</label>
+                        <input type="number" id="view_user_id" placeholder="e.g., 102" value="102">
+                    </div>
+                </div>
+                <button onclick="viewProposal()">View Proposal</button>
+                <div id="viewOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>✅ Approve Venue Proposal</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Booking ID</label>
+                        <input type="number" id="approve_venue_booking_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Venue ID</label>
+                        <input type="number" id="approve_venue_id" placeholder="e.g., 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="approve_venue_user_id" placeholder="e.g., 102" value="102">
+                    </div>
+                </div>
+                <button onclick="approveVenueProposal()">Approve Venue</button>
+                <button class="btn-secondary" onclick="rejectVenue()">Reject & Propose Different</button>
+                <div id="approveVenueOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>⏰ Propose Time</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Booking ID</label>
+                        <input type="number" id="time_booking_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Date (YYYY-MM-DD)</label>
+                        <input type="date" id="time_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Time (HH:MM)</label>
+                        <input type="time" id="time_time">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="number" id="time_user_id" placeholder="e.g., 101" value="101">
+                </div>
+                <button onclick="proposeTime()">Propose Time</button>
+                <div id="timeOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>✅ Approve Time Proposal</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Booking ID</label>
+                        <input type="number" id="approve_time_booking_id" placeholder="e.g., 1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="approve_time_user_id" placeholder="e.g., 102" value="102">
+                    </div>
+                </div>
+                <button onclick="approveTimeProposal()">Approve Time</button>
+                <button class="btn-secondary" onclick="rejectTime()">Reject Time</button>
+                <div id="approveTimeOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🎉 Confirm Booking</h3>
+                <div class="form-group">
+                    <label>Booking ID</label>
+                    <input type="number" id="confirm_booking_id" placeholder="e.g., 1" value="1">
+                </div>
+                <button onclick="confirmBooking()">Confirm Booking</button>
+                <div id="confirmOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- ADMIN SERVICE TAB -->
+        <div id="admin" class="tab-content">
+            <div class="section">
+                <h3>🏢 Add New Venue</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue Name</label>
+                        <input type="text" id="venue_name" placeholder="e.g., The Cozy Coffee Shop" value="The Cozy Coffee Shop">
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="venue_city" placeholder="e.g., New York" value="New York">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="venue_address" placeholder="e.g., 123 Main St" value="123 Main St">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="venue_phone" placeholder="e.g., (555) 123-4567" value="(555) 123-4567">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Capacity</label>
+                        <input type="number" id="venue_capacity" placeholder="e.g., 50" value="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Price per Hour</label>
+                        <input type="number" id="venue_price" placeholder="e.g., 100" step="0.01" value="100">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="venue_description" placeholder="Describe the venue...">A cozy coffee shop perfect for blind dates</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="venue_email" placeholder="e.g., info@venue.com" value="info@cafe.com">
+                </div>
+                <button onclick="addVenue()">Add Venue</button>
+                <div id="addVenueOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📅 Add Time Slots</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Venue ID</label>
+                        <input type="number" id="slot_venue_id" placeholder="e.g., 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Date (YYYY-MM-DD)</label>
+                        <input type="date" id="slot_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Time (HH:MM)</label>
+                        <input type="time" id="slot_time">
+                    </div>
+                </div>
+                <button onclick="addTimeSlot()">Add Time Slot</button>
+                <div id="addSlotOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📊 List All Venues</h3>
+                <button onclick="listVenues()">Get All Venues</button>
+                <div id="listVenuesOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📅 View Available Time Slots</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Venue ID</label>
+                        <input type="number" id="view_venue_id" placeholder="e.g., 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Date (YYYY-MM-DD) - Optional</label>
+                        <input type="date" id="view_slot_date">
+                    </div>
+                </div>
+                <button onclick="viewTimeSlots()">View Time Slots</button>
+                <div id="viewSlotsOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>⭐ Add Venue Review</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Venue ID</label>
+                        <input type="number" id="review_venue_id" placeholder="e.g., 10" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="number" id="review_user_id" placeholder="e.g., 101" value="101">
+                    </div>
+                    <div class="form-group">
+                        <label>Rating (1-5)</label>
+                        <select id="review_rating">
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+                            <option value="3">⭐⭐⭐ 3 Stars</option>
+                            <option value="2">⭐⭐ 2 Stars</option>
+                            <option value="1">⭐ 1 Star</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Comment</label>
+                    <textarea id="review_comment" placeholder="Share your experience...">Great place for a date!</textarea>
+                </div>
+                <button onclick="addReview()">Submit Review</button>
+                <div id="addReviewOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- FACE AUTH TAB -->
+        <div id="faceauth" class="tab-content">
+            <div class="section">
+                <h3>🪪 Verify Face</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="fa_user_id" placeholder="user id">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Image</label>
+                        <input type="file" id="fa_file" accept="image/*">
+                    </div>
+                </div>
+                <button onclick="verifyFace()">Upload & Verify</button>
+                <div id="faVerifyOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📈 Validation Status</h3>
+                <div class="form-group">
+                    <label>User ID</label>
+                    <input type="text" id="fa_status_user_id" placeholder="user id">
+                </div>
+                <button onclick="getFaceStatus()">Get Status</button>
+                <div id="faStatusOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- USER SERVICE TAB -->
+        <div id="user" class="tab-content">
+            <div class="section">
+                <h3>👤 Create User</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="u_name" value="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="u_email" value="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="u_phone" value="+1234567890">
+                    </div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <input type="text" id="u_gender" value="male">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" id="u_dob" value="1996-01-01">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="u_password" value="Passw0rd!">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <input type="text" id="u_bio" value="Adventure seeker">
+                </div>
+                <button onclick="createUser()">Create User</button>
+                <button class="btn-secondary" onclick="signupAuth()">Signup (JWT)</button>
+                <button class="btn-secondary" onclick="loginAuth()">Login (JWT)</button>
+                <div id="userCreateOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>📄 Get / Update User</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="gu_user_id" placeholder="returned id">
+                    </div>
+                    <div class="form-group">
+                        <label>New Name</label>
+                        <input type="text" id="gu_name" placeholder="optional">
+                    </div>
+                    <div class="form-group">
+                        <label>New Bio</label>
+                        <input type="text" id="gu_bio" placeholder="optional">
+                    </div>
+                </div>
+                <button onclick="getUser()">Get User</button>
+                <button class="btn-secondary" onclick="updateUser()">Update User</button>
+                <div id="userGetOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🎛️ Preferences</h3>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="pref_user" placeholder="user id">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Age</label>
+                        <input type="number" id="pref_min_age" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Age</label>
+                        <input type="number" id="pref_max_age" value="35">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Distance (km)</label>
+                        <input type="number" id="pref_distance" value="25">
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Gender</label>
+                        <input type="text" id="pref_gender_pref" value="female">
+                    </div>
+                </div>
+                <button onclick="setPreferences()">Save Preferences</button>
+                <button class="btn-secondary" onclick="getPreferences()">Get Preferences</button>
+                <div id="userPrefOutput" class="output" style="display:none;"></div>
+            </div>
+
+            <div class="section">
+                <h3>🖼️ Upload Photo</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="up_user_id" placeholder="user id">
+                    </div>
+                    <div class="form-group">
+                        <label>Choose Image</label>
+                        <input type="file" id="up_file" accept="image/*">
+                    </div>
+                </div>
+                <button onclick="uploadPhoto()">Upload</button>
+                <div id="userPhotoOutput" class="output" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = {
+            gateway: 'http://localhost:8000',
+            chat: 'http://localhost:8001',
+            matching: 'http://localhost:8002',
+            booking: 'http://localhost:8003',
+            admin: 'http://localhost:8004',
+            faceauth: 'http://localhost:8005',
+            user: 'http://localhost:8006'
+        };
+
+        // Routing + auth state
+        let useGateway = false;
+        let authToken = '';
+
+        document.getElementById('useGatewayToggle').addEventListener('change', (e) => {
+            useGateway = e.target.checked;
+            document.getElementById('routingStatus').textContent = useGateway ? 'Routing: Gateway (Authorization header sent if token set)' : 'Routing: Direct to services';
+        });
+
+        function applyToken() {
+            const val = document.getElementById('tokenInput').value.trim();
+            authToken = val || '';
+            document.getElementById('routingStatus').textContent = authToken ? 'Token: set' : 'Token: not set';
+        }
+
+        function clearToken() {
+            authToken = '';
+            document.getElementById('tokenInput').value = '';
+            document.getElementById('routingStatus').textContent = useGateway ? 'Routing: Gateway (Authorization header sent if token set)' : 'Routing: Direct to services';
+        }
+
+        // Helper to build URL and perform fetch with optional Authorization
+        function apiFetch(service, path, options = {}) {
+            const base = useGateway ? API_BASE.gateway : API_BASE[service];
+            const prefixMapGateway = { matching: 'matches', booking: 'bookings', admin: 'venues', chat: 'chat', faceauth: 'faceauth', user: '' };
+            const prefixMapDirect = { matching: 'matches', booking: 'bookings', admin: 'venues', chat: '', faceauth: 'faceauth', user: '' };
+            const prefix = useGateway ? prefixMapGateway[service] : prefixMapDirect[service];
+            const url = `${base}${prefix ? '/' + prefix : ''}/${path}`;
+            const headers = Object.assign({}, options.headers || {});
+            if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+            return fetch(url, Object.assign({}, options, { headers }));
+        }
+
+        // Check API health on load
+        window.addEventListener('load', checkAPIHealth);
+
+        function checkAPIHealth() {
+            ['gateway','chat','matching','booking','admin','faceauth','user'].forEach(checkAPI);
+        }
+
+        function checkAPI(service) {
+            fetch(`${API_BASE[service]}/health`)
+                .then(r => r.json())
+                .then(() => {
+                    const el = document.getElementById(`${service}Dot`);
+                    if (el) el.className = 'dot green';
+                })
+                .catch(() => {
+                    const el = document.getElementById(`${service}Dot`);
+                    if (el) el.className = 'dot red';
+                });
+        }
+
+        function switchTab(evt, tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(tab);
+            if (target) target.classList.add('active');
+            if (evt && evt.target) evt.target.classList.add('active');
+        }
+
+        function showOutput(elementId, data, isError = false) {
+            const elem = document.getElementById(elementId);
+            elem.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            elem.style.display = 'block';
+            if (isError) elem.className = 'output error';
+            else elem.className = 'output success';
+        }
+
+        // ============ GATEWAY ============
+        async function checkGatewayHealth() {
+            try {
+                const r = await fetch(`${API_BASE.gateway}/health`);
+                const data = await r.json();
+                showOutput('gatewayHealthOutput', data, !r.ok);
+            } catch (e) {
+                showOutput('gatewayHealthOutput', { error: e.message }, true);
+            }
+        }
+
+        // ============ CHAT SERVICE ============
+        async function createChatSession() {
+            const user1_id = document.getElementById('chat_user1').value;
+            const user2_id = document.getElementById('chat_user2').value;
+            const mt = document.getElementById('chat_meeting_time').value; // yyyy-mm-ddThh:mm
+            const duration = parseInt(document.getElementById('chat_duration').value);
+            const meeting_time = mt ? new Date(mt).toISOString() : new Date(Date.now()+60*60*1000).toISOString();
+            try {
+                const r = await apiFetch('chat', `match`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user1_id, user2_id, meeting_time, duration_minutes: duration })
+                });
+                const data = await r.json();
+                showOutput('chatCreateOutput', data, !r.ok);
+                if (data.session_id) {
+                    document.getElementById('chat_session_id').value = data.session_id;
+                    document.getElementById('ws_session_id').value = data.session_id;
+                }
+            } catch (e) {
+                showOutput('chatCreateOutput', { error: e.message }, true);
+            }
+        }
+
+        async function getChatSession() {
+            const sid = document.getElementById('chat_session_id').value;
+            try {
+                const r = await apiFetch('chat', `sessions/${sid}`);
+                const data = await r.json();
+                showOutput('chatSessionOutput', data, !r.ok);
+            } catch (e) {
+                showOutput('chatSessionOutput', { error: e.message }, true);
+            }
+        }
+
+        let ws;
+        function connectWS() {
+            const sid = document.getElementById('ws_session_id').value;
+            const uid = document.getElementById('ws_user_id').value;
+            if (ws) ws.close();
+            const url = `ws://localhost:8001/ws/${sid}/${uid}`;
+            ws = new WebSocket(url);
+            const out = document.getElementById('wsOutput');
+            out.style.display = 'block';
+            out.className = 'output info';
+            out.innerHTML = `<pre>Connecting to ${url} ...</pre>`;
+            ws.onopen = () => out.innerHTML = `<pre>Connected to ${url}</pre>`;
+            ws.onmessage = (ev) => out.innerHTML += `\n<pre>${ev.data}</pre>`;
+            ws.onclose = () => out.innerHTML += `\n<pre>Disconnected</pre>`;
+            ws.onerror = () => out.innerHTML += `\n<pre>Error</pre>`;
+        }
+        function disconnectWS() { if (ws) ws.close(); }
+        function sendWSMessage() {
+            const msg = document.getElementById('ws_message').value;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ content: msg }));
+            }
+        }
+
+        // ============ MATCHING SERVICE ============
+
+        async function createPreference() {
+            const data = {
+                user_id: parseInt(document.getElementById('pref_user_id').value),
+                gender: document.getElementById('pref_gender').value,
+                seeking_gender: document.getElementById('pref_seeking').value,
+                age_min: parseInt(document.getElementById('pref_age_min').value),
+                age_max: parseInt(document.getElementById('pref_age_max').value),
+                interests: document.getElementById('pref_interests').value,
+                bio: document.getElementById('pref_bio').value
+            };
+            try {
+                const response = await apiFetch('matching', 'preferences', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showOutput('prefOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('prefOutput', { error: error.message }, true);
+            }
+        }
+
+        async function findMatch() {
+            const userId = parseInt(document.getElementById('match_user_id').value);
+
+            try {
+                const response = await apiFetch('matching', 'find', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const result = await response.json();
+                showOutput('matchOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('matchOutput', { error: error.message }, true);
+            }
+        }
+
+        async function approveMatch() {
+            const matchId = parseInt(document.getElementById('approve_match_id').value);
+            const userId = parseInt(document.getElementById('approve_user_id').value);
+
+            try {
+                const response = await apiFetch('matching', `approve?user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ match_id: matchId, approved: true })
+                });
+                const result = await response.json();
+                showOutput('approveOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveOutput', { error: error.message }, true);
+            }
+        }
+
+        async function rejectMatch() {
+            const matchId = parseInt(document.getElementById('approve_match_id').value);
+            const userId = parseInt(document.getElementById('approve_user_id').value);
+
+            try {
+                const response = await apiFetch('matching', `approve?user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ match_id: matchId, approved: false })
+                });
+                const result = await response.json();
+                showOutput('approveOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveOutput', { error: error.message }, true);
+            }
+        }
+
+        async function getQueueStatus() {
+            const userId = parseInt(document.getElementById('queue_user_id').value);
+
+            try {
+                const response = await apiFetch('matching', `queue/status/${userId}`);
+                const result = await response.json();
+                showOutput('queueOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('queueOutput', { error: error.message }, true);
+            }
+        }
+
+        // ============ BOOKING SERVICE ============
+
+        async function createBooking() {
+            const data = {
+                match_id: parseInt(document.getElementById('booking_match_id').value),
+                user_1_id: parseInt(document.getElementById('booking_user1_id').value),
+                user_2_id: parseInt(document.getElementById('booking_user2_id').value)
+            };
+
+            try {
+                const response = await apiFetch('booking', 'create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showOutput('bookingCreateOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('bookingCreateOutput', { error: error.message }, true);
+            }
+        }
+
+        async function proposeVenue() {
+            const bookingId = parseInt(document.getElementById('venue_booking_id').value);
+            const venueId = parseInt(document.getElementById('venue_id').value);
+            const userId = parseInt(document.getElementById('venue_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `propose-venue?booking_id=${bookingId}&venue_id=${venueId}&user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                showOutput('venueOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('venueOutput', { error: error.message }, true);
+            }
+        }
+
+        async function viewProposal() {
+            const bookingId = parseInt(document.getElementById('view_booking_id').value);
+            const userId = parseInt(document.getElementById('view_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `${bookingId}/other-proposal/${userId}`);
+                const result = await response.json();
+                showOutput('viewOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('viewOutput', { error: error.message }, true);
+            }
+        }
+
+        async function approveVenueProposal() {
+            const bookingId = parseInt(document.getElementById('approve_venue_booking_id').value);
+            const venueId = parseInt(document.getElementById('approve_venue_id').value);
+            const userId = parseInt(document.getElementById('approve_venue_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `approve-venue?user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ booking_id: bookingId, venue_id: venueId })
+                });
+                const result = await response.json();
+                showOutput('approveVenueOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveVenueOutput', { error: error.message }, true);
+            }
+        }
+
+        async function rejectVenue() {
+            const bookingId = parseInt(document.getElementById('approve_venue_booking_id').value);
+            const userId = parseInt(document.getElementById('approve_venue_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `reject-venue?booking_id=${bookingId}&user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                showOutput('approveVenueOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveVenueOutput', { error: error.message }, true);
+            }
+        }
+
+        async function proposeTime() {
+            const bookingId = parseInt(document.getElementById('time_booking_id').value);
+            const date = document.getElementById('time_date').value;
+            const time = document.getElementById('time_time').value;
+            const userId = parseInt(document.getElementById('time_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `propose-time?booking_id=${bookingId}&date=${date}&time=${time}&user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                showOutput('timeOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('timeOutput', { error: error.message }, true);
+            }
+        }
+
+        async function approveTimeProposal() {
+            const bookingId = parseInt(document.getElementById('approve_time_booking_id').value);
+            const userId = parseInt(document.getElementById('approve_time_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `approve-time?user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ booking_id: bookingId, date: '', time: '' })
+                });
+                const result = await response.json();
+                showOutput('approveTimeOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveTimeOutput', { error: error.message }, true);
+            }
+        }
+
+        async function rejectTime() {
+            const bookingId = parseInt(document.getElementById('approve_time_booking_id').value);
+            const userId = parseInt(document.getElementById('approve_time_user_id').value);
+
+            try {
+                const response = await apiFetch('booking', `reject-time?booking_id=${bookingId}&user_id=${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                showOutput('approveTimeOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('approveTimeOutput', { error: error.message }, true);
+            }
+        }
+
+        async function confirmBooking() {
+            const bookingId = parseInt(document.getElementById('confirm_booking_id').value);
+
+            try {
+                const response = await apiFetch('booking', `confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ booking_id: bookingId })
+                });
+                const result = await response.json();
+                showOutput('confirmOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('confirmOutput', { error: error.message }, true);
+            }
+        }
+
+        // ============ ADMIN SERVICE ============
+
+        async function addVenue() {
+            const data = {
+                name: document.getElementById('venue_name').value,
+                address: document.getElementById('venue_address').value,
+                city: document.getElementById('venue_city').value,
+                description: document.getElementById('venue_description').value,
+                phone: document.getElementById('venue_phone').value,
+                email: document.getElementById('venue_email').value,
+                capacity: parseInt(document.getElementById('venue_capacity').value),
+                price_per_hour: parseFloat(document.getElementById('venue_price').value)
+            };
+
+            try {
+                const response = await apiFetch('admin', ``, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showOutput('addVenueOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('addVenueOutput', { error: error.message }, true);
+            }
+        }
+
+        async function addTimeSlot() {
+            const venueId = parseInt(document.getElementById('slot_venue_id').value);
+            const date = document.getElementById('slot_date').value;
+            const time = document.getElementById('slot_time').value;
+
+            try {
+                const response = await apiFetch('admin', `timeslots`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ venue_id: venueId, date, time })
+                });
+                const result = await response.json();
+                showOutput('addSlotOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('addSlotOutput', { error: error.message }, true);
+            }
+        }
+
+        async function listVenues() {
+            try {
+                const response = await apiFetch('admin', ``);
+                const result = await response.json();
+                showOutput('listVenuesOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('listVenuesOutput', { error: error.message }, true);
+            }
+        }
+
+        async function viewTimeSlots() {
+            const venueId = parseInt(document.getElementById('view_venue_id').value);
+            const date = document.getElementById('view_slot_date').value;
+            const dateParam = date ? `&date=${date}` : '';
+
+            try {
+                const response = await apiFetch('admin', `${venueId}/timeslots?available_only=true${dateParam}`);
+                const result = await response.json();
+                showOutput('viewSlotsOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('viewSlotsOutput', { error: error.message }, true);
+            }
+        }
+
+        async function addReview() {
+            const data = {
+                venue_id: parseInt(document.getElementById('review_venue_id').value),
+                user_id: parseInt(document.getElementById('review_user_id').value),
+                rating: parseInt(document.getElementById('review_rating').value),
+                comment: document.getElementById('review_comment').value
+            };
+
+            try {
+                const response = await apiFetch('admin', `reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showOutput('addReviewOutput', result, !response.ok);
+            } catch (error) {
+                showOutput('addReviewOutput', { error: error.message }, true);
+            }
+        }
+
+        // Refresh API health every 10 seconds
+        setInterval(checkAPIHealth, 10000);
+
+        // ============ FACE AUTH SERVICE ============
+        async function verifyFace() {
+            const userId = document.getElementById('fa_user_id').value;
+            const file = document.getElementById('fa_file').files[0];
+            const fd = new FormData();
+            if (file) fd.append('image', file);
+            try {
+                const r = await apiFetch('faceauth', `verify/${userId}`, { method: 'POST', body: fd });
+                const data = await r.json();
+                showOutput('faVerifyOutput', data, !r.ok);
+            } catch (e) { showOutput('faVerifyOutput', { error: e.message }, true); }
+        }
+        async function getFaceStatus() {
+            const userId = document.getElementById('fa_status_user_id').value;
+            try {
+                const r = await apiFetch('faceauth', `status/${userId}`);
+                const data = await r.json();
+                showOutput('faStatusOutput', data, !r.ok);
+            } catch (e) { showOutput('faStatusOutput', { error: e.message }, true); }
+        }
+
+        // ============ USER SERVICE ============
+        async function createUser() {
+            const payload = {
+                name: document.getElementById('u_name').value,
+                email: document.getElementById('u_email').value,
+                phone: document.getElementById('u_phone').value,
+                gender: document.getElementById('u_gender').value,
+                dob: document.getElementById('u_dob').value,
+                password: document.getElementById('u_password').value,
+                bio: document.getElementById('u_bio').value
+            };
+            try {
+                const r = await apiFetch('user', `users/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await r.json();
+                showOutput('userCreateOutput', data, !r.ok);
+                if (data.id) {
+                    document.getElementById('gu_user_id').value = data.id;
+                    document.getElementById('pref_user').value = data.id;
+                    document.getElementById('up_user_id').value = data.id;
+                }
+            } catch (e) { showOutput('userCreateOutput', { error: e.message }, true); }
+        }
+        async function getUser() {
+            const id = document.getElementById('gu_user_id').value;
+            try {
+                const r = await apiFetch('user', `users/${id}`);
+                const data = await r.json();
+                showOutput('userGetOutput', data, !r.ok);
+            } catch (e) { showOutput('userGetOutput', { error: e.message }, true); }
+        }
+        async function updateUser() {
+            const id = document.getElementById('gu_user_id').value;
+            const payload = {};
+            const name = document.getElementById('gu_name').value; if (name) payload.name = name;
+            const bio = document.getElementById('gu_bio').value; if (bio) payload.bio = bio;
+            try {
+                const r = await apiFetch('user', `users/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await r.json();
+                showOutput('userGetOutput', data, !r.ok);
+            } catch (e) { showOutput('userGetOutput', { error: e.message }, true); }
+        }
+        async function setPreferences() {
+            const id = document.getElementById('pref_user').value;
+            const payload = {
+                min_age: parseInt(document.getElementById('pref_min_age').value),
+                max_age: parseInt(document.getElementById('pref_max_age').value),
+                distance_km: parseInt(document.getElementById('pref_distance').value),
+                preferred_gender: document.getElementById('pref_gender_pref').value
+            };
+            try {
+                const r = await apiFetch('user', `users/${id}/preferences`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await r.json();
+                showOutput('userPrefOutput', data, !r.ok);
+            } catch (e) { showOutput('userPrefOutput', { error: e.message }, true); }
+        }
+        async function getPreferences() {
+            const id = document.getElementById('pref_user').value;
+            try {
+                const r = await apiFetch('user', `users/${id}/preferences`);
+                const data = await r.json();
+                showOutput('userPrefOutput', data, !r.ok);
+            } catch (e) { showOutput('userPrefOutput', { error: e.message }, true); }
+        }
+        async function uploadPhoto() {
+            const id = document.getElementById('up_user_id').value;
+            const file = document.getElementById('up_file').files[0];
+            const fd = new FormData();
+            if (file) fd.append('file', file);
+            try {
+                const r = await apiFetch('user', `users/${id}/photos`, { method: 'POST', body: fd });
+                const data = await r.json();
+                showOutput('userPhotoOutput', data, !r.ok);
+            } catch (e) { showOutput('userPhotoOutput', { error: e.message }, true); }
+        }
+
+        // ============ USER AUTH (for gateway) ============
+        async function signupAuth() {
+            const payload = {
+                name: document.getElementById('u_name').value,
+                email: document.getElementById('u_email').value,
+                phone: document.getElementById('u_phone').value,
+                gender: document.getElementById('u_gender').value,
+                dob: document.getElementById('u_dob').value,
+                password: document.getElementById('u_password').value,
+                bio: document.getElementById('u_bio').value
+            };
+            try {
+                const r = await apiFetch('user', `auth/signup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await r.json();
+                showOutput('userCreateOutput', data, !r.ok);
+                if (data.access_token) {
+                    authToken = data.access_token;
+                    document.getElementById('tokenInput').value = authToken;
+                    document.getElementById('routingStatus').textContent = 'Token: set';
+                }
+            } catch (e) { showOutput('userCreateOutput', { error: e.message }, true); }
+        }
+        async function loginAuth() {
+            const payload = { email: document.getElementById('u_email').value, password: document.getElementById('u_password').value };
+            try {
+                const r = await apiFetch('user', `auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await r.json();
+                showOutput('userCreateOutput', data, !r.ok);
+                if (data.access_token) {
+                    authToken = data.access_token;
+                    document.getElementById('tokenInput').value = authToken;
+                    document.getElementById('routingStatus').textContent = 'Token: set';
+                }
+            } catch (e) { showOutput('userCreateOutput', { error: e.message }, true); }
+        }
+    </script>
+</body>
+</html>

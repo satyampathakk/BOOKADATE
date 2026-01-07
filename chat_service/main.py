@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import uuid
 import json
 from typing import Dict, List, Optional
@@ -22,6 +22,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# Helpers
+def to_utc(dt: datetime) -> datetime:
+    """Return a timezone-aware UTC datetime.
+    If dt is naive, assume UTC. If dt has tzinfo, convert to UTC.
+    """
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 # Models
 class ChatStatus(str, Enum):
@@ -103,9 +116,10 @@ async def create_match(match_request: MatchRequest):
     Create a chat session when users are matched.
     The chat session will be active for the specified duration around the meeting time.
     """
-    # Calculate start and end times (adding a buffer before and after meeting)
-    start_time = match_request.meeting_time - timedelta(minutes=30)  # Start chat 30 mins before
-    end_time = match_request.meeting_time + timedelta(minutes=match_request.duration_minutes + 30)  # End 30 mins after
+    # Normalize meeting time to UTC and calculate start/end buffers
+    meeting_time_utc = to_utc(match_request.meeting_time)
+    start_time = meeting_time_utc - timedelta(minutes=30)  # Start chat 30 mins before
+    end_time = meeting_time_utc + timedelta(minutes=match_request.duration_minutes + 30)  # End 30 mins after
     
     session_id = str(uuid.uuid4())
     
@@ -115,7 +129,7 @@ async def create_match(match_request: MatchRequest):
         user2_id=match_request.user2_id,
         start_time=start_time,
         end_time=end_time,
-        status=ChatStatus.PENDING if datetime.now() < start_time else ChatStatus.ACTIVE,
+        status=ChatStatus.PENDING if datetime.now(timezone.utc) < start_time else ChatStatus.ACTIVE,
         messages=[]
     )
     
@@ -135,7 +149,7 @@ async def get_session(session_id: str):
     session = chat_sessions[session_id]
     
     # Update status if needed
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     if current_time >= session.end_time and session.status != ChatStatus.EXPIRED:
         session.status = ChatStatus.EXPIRED
     elif current_time >= session.start_time and current_time < session.end_time and session.status == ChatStatus.PENDING:
@@ -165,7 +179,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str, user_id: str
         return
     
     # Check if chat is active
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     if session.status == ChatStatus.EXPIRED or current_time < session.start_time or current_time > session.end_time:
         await websocket.close(code=1008, reason="Chat session not active")
         return
@@ -177,7 +191,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str, user_id: str
             data = await websocket.receive_text()
             
             # Check session status again before processing message
-            current_time = datetime.now()
+            current_time = datetime.now(timezone.utc)
             if session.status == ChatStatus.EXPIRED or current_time < session.start_time or current_time > session.end_time:
                 await websocket.send_text(json.dumps({"error": "Chat session has expired"}))
                 break
@@ -212,7 +226,7 @@ async def update_session_status(session_id: str):
     
     while session_id in chat_sessions:
         session = chat_sessions[session_id]
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
         
         if current_time >= session.end_time and session.status != ChatStatus.EXPIRED:
             session.status = ChatStatus.EXPIRED
@@ -245,4 +259,4 @@ async def update_session_status(session_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

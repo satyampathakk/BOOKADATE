@@ -12,3 +12,7 @@ app.include_router(faceauth_router, prefix="/faceauth")
 @app.get("/health")
 def health_check():
     return {"status": "faceauth service running"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8005)
