@@ -1,18 +1,21 @@
-from fastapi import FastAPI, Request, HTTPException, status, Depends
+from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse, Response
 import httpx
-from typing import Optional
 import logging
+from typing import Optional
 
-# Configure logging
+# --------------------------------------------------
+# Logging
+# --------------------------------------------------
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("api-gateway")
 
-app = FastAPI(title="API Gateway", version="1.0.0")
+# --------------------------------------------------
+# App
+# --------------------------------------------------
+app = FastAPI(title="API Gateway", version="1.1.0")
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,276 +24,223 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Security
-security = HTTPBearer()
-
-# Service URLs - Configure these based on your setup
+# --------------------------------------------------
+# Services
+# --------------------------------------------------
 SERVICE_URLS = {
-    "user_service": "http://localhost:8006",
-    "match_service": "http://localhost:8002",
-    "booking_service": "http://localhost:8003",
-    "venue_service": "http://localhost:8004",
-    "chat_service": "http://localhost:8001",
+    "user": "http://localhost:8006",
+    "match": "http://localhost:8002",
+    "booking": "http://localhost:8003",
+    "venue": "http://localhost:8004",
+    "chat": "http://localhost:8001",
 }
 
-# Routes that don't require authentication
-PUBLIC_ROUTES = [
-    "/auth/signup",
+# --------------------------------------------------
+# Public routes (NO AUTH)
+# --------------------------------------------------
+PUBLIC_PREFIXES = (
     "/auth/login",
+    "/auth/signup",
     "/health",
     "/docs",
     "/openapi.json",
-]
+    "/chat/match",
+    "/chat/sessions",
+)
 
-# HTTP Client with timeout
-timeout = httpx.Timeout(30.0, connect=10.0)
-client = httpx.AsyncClient(timeout=timeout)
+# --------------------------------------------------
+# HTTP Client
+# --------------------------------------------------
+client = httpx.AsyncClient(
+    timeout=httpx.Timeout(30.0, connect=10.0)
+)
 
-async def verify_token(token: str) -> dict:
-    """
-    Verify token with user service
-    Returns user info if valid, raises HTTPException if invalid
-    """
-    try:
-        headers = {"Authorization": f"Bearer {token}"}
-        response = await client.post(
-            f"{SERVICE_URLS['user_service']}/auth/verify-token",
-            headers=headers
-        )
-        
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired token"
-            )
-    except httpx.RequestError as e:
-        logger.error(f"Error verifying token: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Authentication service unavailable"
-        )
-
-def is_public_route(path: str) -> bool:
-    """Check if route is public (doesn't require authentication)"""
-    for public_path in PUBLIC_ROUTES:
-        if path.startswith(public_path):
-            return True
+# --------------------------------------------------
+# Helpers
+# --------------------------------------------------
+def is_public(path: str, method: str = "GET") -> bool:
+    # Check basic public prefixes
+    if any(path.startswith(p) for p in PUBLIC_PREFIXES):
+        return True
+    
+    # Allow GET requests to venues for browsing (but not POST/PUT/DELETE)
+    if path.startswith("/venues") and method == "GET":
+        return True
+    
     return False
 
-@app.middleware("http")
-async def gateway_middleware(request: Request, call_next):
-    """
-    Gateway middleware that:
-    1. Checks if route is public
-    2. Verifies JWT token for protected routes
-    3. Forwards request to appropriate microservice
-    """
-    path = request.url.path
-    
-    # Allow public routes without authentication
-    if is_public_route(path):
-        return await call_next(request)
-    
-    # Allow CORS preflight requests (OPTIONS) without authentication
-    if request.method == "OPTIONS":
-        return await call_next(request)
-    
-    # Check for Authorization header
-    auth_header = request.headers.get("Authorization")
-    
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Missing or invalid authorization header"}
-        )
-    
-    # Extract token
-    token = auth_header.split(" ")[1]
-    
-    # Verify token with user service
+
+async def verify_token(token: str) -> dict:
     try:
-        user_info = await verify_token(token)
-        # Add user info to request state for downstream use
-        request.state.user = user_info
-        logger.info(f"Authenticated user: {user_info.get('user_id')}")
-    except HTTPException as e:
-        return JSONResponse(
-            status_code=e.status_code,
-            content={"detail": e.detail}
+        res = await client.post(
+            f"{SERVICE_URLS['user']}/auth/verify-token",
+            headers={"Authorization": f"Bearer {token}"}
         )
-    
+
+        if res.status_code != 200:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        return res.json()
+
+    except httpx.RequestError as e:
+        logger.error(f"Auth service down: {e}")
+        raise HTTPException(status_code=503, detail="Auth service unavailable")
+
+
+async def proxy_request(
+    service_url: str,
+    request: Request,
+    path_override: Optional[str] = None
+):
+    try:
+        url = f"{service_url}{path_override or request.url.path}"
+
+        headers = {
+            k: v for k, v in request.headers.items()
+            if k.lower() not in {"host", "content-length"}
+        }
+
+        body = await request.body()
+
+        resp = await client.request(
+            request.method,
+            url,
+            headers=headers,
+            params=request.query_params,
+            content=body if body else None
+        )
+
+        # ---- SAFE JSON HANDLING ----
+        content_type = resp.headers.get("content-type", "")
+        if "application/json" in content_type:
+            try:
+                content = resp.json()
+            except Exception:
+                content = {"detail": resp.text}
+            return JSONResponse(content, status_code=resp.status_code)
+
+        return Response(
+            content=resp.content,
+            status_code=resp.status_code,
+            media_type=content_type
+        )
+
+    except httpx.RequestError as e:
+        logger.error(f"Upstream error: {e}")
+        raise HTTPException(status_code=503, detail="Service unavailable")
+
+
+# --------------------------------------------------
+# Middleware (AUTH)
+# --------------------------------------------------
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    path = request.url.path
+    method = request.method
+
+    # Skip auth for OPTIONS, public routes, and admin routes
+    if method == "OPTIONS" or is_public(path, method) or path.startswith("/admin"):
+        return await call_next(request)
+
+    auth = request.headers.get("Authorization")
+    if not auth or not auth.startswith("Bearer "):
+        return JSONResponse(
+            {"detail": "Authorization required"},
+            status_code=401
+        )
+
+    token = auth.split(" ", 1)[1]
+
+    try:
+        request.state.user = await verify_token(token)
+    except HTTPException as e:
+        return JSONResponse({"detail": e.detail}, status_code=e.status_code)
+
     return await call_next(request)
 
-async def forward_request(
-    service_url: str,
-    path: str,
-    method: str,
-    headers: dict,
-    body: Optional[bytes] = None,
-    params: dict = None
-):
-    """Forward request to microservice"""
-    try:
-        url = f"{service_url}{path}"
-        
-        # Remove host header to avoid conflicts
-        headers_to_forward = {k: v for k, v in headers.items() if k.lower() != "host"}
-        
-        response = await client.request(
-            method=method,
-            url=url,
-            headers=headers_to_forward,
-            content=body,
-            params=params
-        )
 
-        try:
-            payload = response.json() if response.text else {}
-        except ValueError:
-            payload = {"detail": response.text or "Upstream returned non-JSON"}
-        
-        return JSONResponse(
-            content=payload,
-            status_code=response.status_code,
-            headers=dict(response.headers)
-        )
-    except httpx.RequestError as e:
-        logger.error(f"Error forwarding request to {service_url}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Service temporarily unavailable"
-        )
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error"
-        )
-
+# --------------------------------------------------
+# Health
+# --------------------------------------------------
 @app.get("/health")
-async def health_check():
-    """Gateway health check"""
-    service_health = {}
-    
-    for service_name, service_url in SERVICE_URLS.items():
-        try:
-            response = await client.get(f"{service_url}/health", timeout=5.0)
-            service_health[service_name] = {
-                "status": "healthy" if response.status_code == 200 else "unhealthy",
-                "status_code": response.status_code
-            }
-        except Exception as e:
-            service_health[service_name] = {
-                "status": "unavailable",
-                "error": str(e)
-            }
-    
-    return {
-        "gateway": "healthy",
-        "services": service_health
-    }
+async def health():
+    return {"gateway": "healthy"}
 
-# ==================== USER SERVICE ROUTES ====================
 
-@app.api_route("/auth/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+# --------------------------------------------------
+# ROUTES
+# --------------------------------------------------
+@app.api_route("/auth/{path:path}", methods=["GET", "POST"])
 async def auth_routes(path: str, request: Request):
-    """Forward authentication requests to user service"""
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    
-    return await forward_request(
-        service_url=SERVICE_URLS["user_service"],
-        path=f"/auth/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+    return await proxy_request(
+        SERVICE_URLS["user"],
+        request,
+        f"/auth/{path}"
     )
+
 
 @app.api_route("/users/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def user_routes(path: str, request: Request):
-    """Forward user requests to user service (requires authentication)"""
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    
-    return await forward_request(
-        service_url=SERVICE_URLS["user_service"],
-        path=f"/users/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+    return await proxy_request(
+        SERVICE_URLS["user"],
+        request,
+        f"/users/{path}"
     )
 
 
-# ==================== EXAMPLE: OTHER SERVICE ROUTES ====================
+@app.api_route("/admin/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+async def admin_routes(path: str, request: Request):
+    return await proxy_request(
+        SERVICE_URLS["user"],
+        request,
+        f"/admin/{path}"
+    )
+
+
 @app.api_route("/matches/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def match_routes(path: str, request: Request):
-    """Forward match requests to matching service (requires authentication)"""
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    return await forward_request(
-        service_url=SERVICE_URLS["match_service"],
-        path=f"/matches/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+    return await proxy_request(
+        SERVICE_URLS["match"],
+        request,
+        f"/matches/{path}"
     )
+
 
 @app.api_route("/bookings/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def booking_routes(path: str, request: Request):
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    return await forward_request(
-        service_url=SERVICE_URLS["booking_service"],
-        path=f"/bookings/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+    return await proxy_request(
+        SERVICE_URLS["booking"],
+        request,
+        f"/bookings/{path}"
     )
 
+
 @app.api_route("/venues/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def admin_routes(path: str, request: Request):
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    return await forward_request(
-        service_url=SERVICE_URLS["venue_service"],
-        path=f"/venues/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+async def venue_routes(path: str, request: Request):
+    return await proxy_request(
+        SERVICE_URLS["venue"],
+        request,
+        f"/venues/{path}"
     )
+
 
 @app.api_route("/chat/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def chat_routes(path: str, request: Request):
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    return await forward_request(
-        service_url=SERVICE_URLS["chat_service"],
-        path=f"/{path}",  # chat service defines /match and /sessions, keep root
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
-    )
- 
-@app.api_route("/admin/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def admin_routes_user(path: str, request: Request):
-    body = await request.body() if request.method in ["POST", "PUT"] else None
-    return await forward_request(
-        service_url=SERVICE_URLS["user_service"],
-        path=f"/admin/{path}",
-        method=request.method,
-        headers=dict(request.headers),
-        body=body,
-        params=dict(request.query_params)
+    return await proxy_request(
+        SERVICE_URLS["chat"],
+        request,
+        f"/{path}"
     )
 
 
+# --------------------------------------------------
+# Shutdown
+# --------------------------------------------------
 @app.on_event("shutdown")
-async def shutdown_event():
-    """Close HTTP client on shutdown"""
+async def shutdown():
     await client.aclose()
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
