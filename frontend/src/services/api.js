@@ -215,10 +215,54 @@ export const venueAPI = {
 };
 
 export const adminAPI = {
-  listRegistrations: (status) => apiClient.get('/admin/registrations', { params: { status } }),
-  getRegistration: (userId) => apiClient.get(`/admin/registrations/${userId}`),
-  approveRegistration: (userId) => apiClient.post(`/admin/registrations/${userId}/approve`),
-  rejectRegistration: (userId, reason) => apiClient.post(`/admin/registrations/${userId}/reject`, { reason }),
+  // Admin authentication
+  authenticate: () => {
+    const adminCredentials = {
+      email: "admin@example.com",
+      password: "SuperSecret123"
+    };
+    return apiClient.post('/admin/auth', adminCredentials);
+  },
+
+  // Get registrations using POST method (with credentials in body)
+  getRegistrations: (status) => {
+    const payload = {
+      email: "admin@example.com",
+      password: "SuperSecret123"
+    };
+    if (status) {
+      payload.status = status;
+    }
+    return apiClient.post('/admin/registrations', payload);
+  },
+  
+  // Get single registration using POST method
+  getRegistration: (userId) => {
+    const adminCredentials = {
+      email: "admin@example.com",
+      password: "SuperSecret123"
+    };
+    return apiClient.post(`/admin/registrations/${userId}`, adminCredentials);
+  },
+  
+  // Approve registration
+  approveRegistration: (userId) => {
+    const adminCredentials = {
+      email: "admin@example.com",
+      password: "SuperSecret123"
+    };
+    return apiClient.post(`/admin/registrations/${userId}/approve`, adminCredentials);
+  },
+  
+  // Reject registration
+  rejectRegistration: (userId, data) => {
+    const payload = {
+      email: "admin@example.com",
+      password: "SuperSecret123",
+      reason: data.reason
+    };
+    return apiClient.post(`/admin/registrations/${userId}/reject`, payload);
+  },
 };
 
 // Chat API

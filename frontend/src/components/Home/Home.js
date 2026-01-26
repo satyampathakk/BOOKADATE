@@ -1,130 +1,345 @@
-import React from 'react';
-import { Container, Row, Col, Card, Button, Jumbotron } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useUser } from '../../contexts/UserContext';
 
 const Home = () => {
+  const { user } = useUser();
+
   return (
-    <div className="home-page">
+    <Container className="py-5">
       {/* Hero Section */}
-      <div className="hero-section bg-primary text-white py-5">
-        <Container>
-          <Row className="align-items-center">
-            <Col md={6}>
-              <h1 className="display-4 fw-bold">Find Your Perfect Match</h1>
-              <p className="lead">
-                Join our blind date platform and discover meaningful connections with people who share your interests.
-              </p>
-              <div className="d-grid gap-2 d-md-block">
-                <Link to="/signup" className="btn btn-light btn-lg me-md-2">
-                  Get Started
+      <Row className="mb-5">
+        <Col>
+          <div className="text-center">
+            <h1 className="display-4 mb-3" style={{ fontWeight: '800', color: '#7c3aed' }}>
+              Find Your Perfect Match
+            </h1>
+            <p className="lead text-muted mb-4" style={{ fontWeight: '600' }}>
+              Connect with like-minded people through our intelligent matching system. 
+              Safe, secure, and designed for meaningful relationships.
+            </p>
+            {!user && (
+              <div className="d-flex gap-3 justify-content-center flex-wrap">
+                <Link to="/signup">
+                  <Button variant="dark" size="lg" className="px-4">
+                    Get Started
+                  </Button>
                 </Link>
-                <Link to="/login" className="btn btn-outline-light btn-lg">
-                  Log In
+                <Link to="/venues">
+                  <Button variant="outline-dark" size="lg" className="px-4">
+                    Browse Venues
+                  </Button>
                 </Link>
               </div>
-            </Col>
-            <Col md={6} className="text-center">
-              <div className="hero-image-placeholder">
-                <svg width="100%" height="300" viewBox="0 0 500 300">
-                  <circle cx="250" cy="150" r="100" fill="#fff" opacity="0.2" />
-                  <g transform="translate(150, 100)">
-                    <circle cx="0" cy="0" r="40" fill="#fff" />
-                    <circle cx="-50" cy="-40" r="30" fill="#fff" />
-                    <circle cx="50" cy="-40" r="30" fill="#fff" />
-                    <path d="M -30 20 Q 0 40 30 20" stroke="#fff" strokeWidth="3" fill="none" />
-                  </g>
-                </svg>
+            )}
+            {user && (
+              <div className="d-flex gap-3 justify-content-center flex-wrap">
+                <Link to="/dashboard">
+                  <Button variant="dark" size="lg" className="px-4">
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link to="/matching">
+                  <Button variant="outline-dark" size="lg" className="px-4">
+                    Find Matches
+                  </Button>
+                </Link>
               </div>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+            )}
+          </div>
+        </Col>
+      </Row>
 
-      {/* Feature Section */}
-      <Container className="py-5">
-        <Row className="mb-5">
-          <Col className="text-center">
-            <h2 className="fw-bold">How It Works</h2>
-            <p className="text-muted">Simple steps to find your perfect match</p>
-          </Col>
-        </Row>
+      {/* Statistics Cards */}
+      <Row className="mb-5 g-4">
+        <Col lg={3} md={6}>
+          <div className="bg-white rounded-3 p-4 text-center shadow-sm border">
+            <div className="display-6 fw-bold text-dark mb-2">10K+</div>
+            <div className="text-muted">Active Users</div>
+          </div>
+        </Col>
+        <Col lg={3} md={6}>
+          <div className="bg-white rounded-3 p-4 text-center shadow-sm border">
+            <div className="display-6 fw-bold text-dark mb-2">2.5K+</div>
+            <div className="text-muted">Successful Matches</div>
+          </div>
+        </Col>
+        <Col lg={3} md={6}>
+          <div className="bg-white rounded-3 p-4 text-center shadow-sm border">
+            <div className="display-6 fw-bold text-dark mb-2">500+</div>
+            <div className="text-muted">Partner Venues</div>
+          </div>
+        </Col>
+        <Col lg={3} md={6}>
+          <div className="bg-white rounded-3 p-4 text-center shadow-sm border">
+            <div className="display-6 fw-bold text-dark mb-2">95%</div>
+            <div className="text-muted">Satisfaction Rate</div>
+          </div>
+        </Col>
+      </Row>
 
-        <Row className="g-4">
-          <Col md={4}>
-            <Card className="h-100 text-center p-4 shadow-sm">
-              <div className="feature-icon mb-3 mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-person-plus" viewBox="0 0 16 16">
-                  <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-.5-8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z"/>
-                  <path d="M9.5 3a.5.5 0 0 1 .5.5V5h1.5a.5.5 0 0 1 0 1H10v1.5a.5.5 0 0 1-1 0V6H7.5a.5.5 0 0 1 0-1H9V3.5a.5.5 0 0 1 .5-.5z"/>
-                </svg>
+      {/* How It Works Cards */}
+      <Row className="mb-5">
+        <Col>
+          <div className="text-center mb-5">
+            <h2 className="display-6 mb-3" style={{ fontWeight: '800', color: '#000000' }}>How It Works</h2>
+            <p className="lead text-muted" style={{ fontWeight: '600' }}>Simple steps to find your perfect match</p>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="mb-5 g-4">
+        <Col lg={3} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">1</span>
               </div>
-              <Card.Body>
-                <Card.Title className="fw-bold">Create Profile</Card.Title>
-                <Card.Text>
-                  Sign up and create your profile with your preferences, interests, and personality traits.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
+              <Card.Title className="h5 fw-bold">Create Profile</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Sign up and create your profile with photos and preferences to help us find your perfect match.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
 
-          <Col md={4}>
-            <Card className="h-100 text-center p-4 shadow-sm">
-              <div className="feature-icon mb-3 mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-shuffle" viewBox="0 0 16 16">
-                  <path fillRule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1h3.05A2.5 2.5 0 0 1 4 3.5c0 1.378 1.122 2.5 2.5 2.5v.75c-1.793 0-3.25-1.457-3.25-3.25H.5a.5.5 0 0 1-.5-.5zM5.5 6A1.5 1.5 0 1 0 4 4.5 1.5 1.5 0 0 0 5.5 6zM16 3.5a.5.5 0 0 1-.5.5h-3.05a2.5 2.5 0 0 0-2.5-2.5v-.75a3.25 3.25 0 0 1 3.25 3.25H15.5a.5.5 0 0 1 .5.5zm-5 1a.5.5 0 0 1 .5.5v1.75a3.25 3.25 0 0 0 3.25 3.25H15.5a.5.5 0 0 1 0 1h-.75a.75.75 0 0 1 0-1.5H15a.5.5 0 0 1 .5-.5v-1.75a1.5 1.5 0 0 0-1.5-1.5H10.5a.5.5 0 0 1-.5-.5z"/>
-                  <path fillRule="evenodd" d="M0 12.5a.5.5 0 0 1 .5-.5H1h3.05a2.5 2.5 0 0 1 2.5 2.5v.75c-1.793 0-3.25-1.457-3.25-3.25H.5a.5.5 0 0 1-.5-.5zM5.5 13A1.5 1.5 0 1 0 4 11.5 1.5 1.5 0 0 0 5.5 13zm9.5 1a.5.5 0 0 1-.5.5h-3.05a2.5 2.5 0 0 0-2.5-2.5v-.75a3.25 3.25 0 0 1 3.25 3.25H15.5a.5.5 0 0 1 0 1z"/>
-                </svg>
+        <Col lg={3} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">2</span>
               </div>
-              <Card.Body>
-                <Card.Title className="fw-bold">Get Matched</Card.Title>
-                <Card.Text>
-                  Our algorithm finds compatible matches based on your preferences and interests.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
+              <Card.Title className="h5 fw-bold">Smart Matching</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Our algorithm analyzes compatibility based on interests, values, and preferences to find ideal partners.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
 
-          <Col md={4}>
-            <Card className="h-100 text-center p-4 shadow-sm">
-              <div className="feature-icon mb-3 mx-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-calendar-check" viewBox="0 0 16 16">
-                  <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
-                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                </svg>
+        <Col lg={3} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">3</span>
               </div>
-              <Card.Body>
-                <Card.Title className="fw-bold">Schedule Dates</Card.Title>
-                <Card.Text>
-                  Work together to pick a venue and time that suits both of you.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+              <Card.Title className="h5 fw-bold">Choose Venue</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Browse curated venues and work together to pick the perfect spot for your first date.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
 
-      {/* CTA Section */}
-      <div className="cta-section bg-light py-5">
-        <Container>
-          <Row className="align-items-center">
-            <Col md={8}>
-              <h2 className="fw-bold">Ready to Find Your Match?</h2>
-              <p className="lead">
-                Join thousands of others who have found meaningful connections through our platform.
+        <Col lg={3} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">4</span>
+              </div>
+              <Card.Title className="h5 fw-bold">Connect & Meet</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Chat before your date to break the ice, then meet in person for an unforgettable experience.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Features Cards */}
+      <Row className="mb-5">
+        <Col>
+          <div className="text-center mb-5">
+            <h2 className="display-6 mb-3" style={{ fontWeight: '800', color: '#000000' }}>Why Choose Our Platform?</h2>
+            <p className="lead text-muted" style={{ fontWeight: '600' }}>Everything you need for meaningful connections</p>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="mb-5 g-4">
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">✓</span>
+              </div>
+              <Card.Title className="h5 fw-bold">Safe & Secure</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                All profiles are verified with ID documents. Your safety is our priority.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">★</span>
+              </div>
+              <Card.Title className="h5 fw-bold">Premium Venues</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Handpicked romantic locations perfect for memorable first dates.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="d-flex flex-column text-center p-4">
+              <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                style={{ width: '60px', height: '60px' }}>
+                <span className="h5 mb-0">💬</span>
+              </div>
+              <Card.Title className="h5 fw-bold">Real-time Chat</Card.Title>
+              <Card.Text className="flex-grow-1 text-muted">
+                Connect instantly with your matches through our secure chat system.
+              </Card.Text>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Success Stories */}
+      <Row className="mb-5">
+        <Col>
+          <div className="text-center mb-5">
+            <h2 className="display-6 mb-3" style={{ fontWeight: '800', color: '#000000' }}>Success Stories</h2>
+            <p className="lead text-muted" style={{ fontWeight: '600' }}>Real couples who found love through our platform</p>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="mb-5 g-4">
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="p-4">
+              <div className="text-warning mb-3" style={{ fontSize: '1.2rem' }}>★★★★★</div>
+              <Card.Text className="mb-4 text-muted">
+                "I was skeptical about blind dating, but this platform changed everything! 
+                Met my soulmate on the second date. We're getting married next month!"
+              </Card.Text>
+              <div className="d-flex align-items-center">
+                <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3"
+                  style={{ width: '40px', height: '40px' }}>
+                  <span className="small">E</span>
+                </div>
+                <div>
+                  <div className="fw-bold">Emma & James</div>
+                  <small className="text-muted">Matched in March 2024</small>
+                </div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="p-4">
+              <div className="text-warning mb-3" style={{ fontSize: '1.2rem' }}>★★★★★</div>
+              <Card.Text className="mb-4 text-muted">
+                "The venue selection made our first date perfect. No awkward 'where should we go?' 
+                conversations. Just pure connection and great food!"
+              </Card.Text>
+              <div className="d-flex align-items-center">
+                <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3"
+                  style={{ width: '40px', height: '40px' }}>
+                  <span className="small">A</span>
+                </div>
+                <div>
+                  <div className="fw-bold">Alex & Maria</div>
+                  <small className="text-muted">Matched in January 2024</small>
+                </div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={4} md={6}>
+          <Card className="h-100 border shadow-sm">
+            <Card.Body className="p-4">
+              <div className="text-warning mb-3" style={{ fontSize: '1.2rem' }}>★★★★★</div>
+              <Card.Text className="mb-4 text-muted">
+                "Finally, a dating app that focuses on real connections! The matching algorithm 
+                is incredible - found someone who truly gets me."
+              </Card.Text>
+              <div className="d-flex align-items-center">
+                <div className="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3"
+                  style={{ width: '40px', height: '40px' }}>
+                  <span className="small">S</span>
+                </div>
+                <div>
+                  <div className="fw-bold">Sophie & David</div>
+                  <small className="text-muted">Matched in February 2024</small>
+                </div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Call to Action */}
+      <Row className="mb-5">
+        <Col lg={8} className="mx-auto">
+          <Card className="border shadow-sm">
+            <Card.Body className="text-center p-5">
+              <h3 className="mb-3" style={{ fontWeight: '800', color: '#000000' }}>Ready to Find Your Perfect Match?</h3>
+              <p className="lead text-muted mb-4" style={{ fontWeight: '600' }}>
+                Join thousands of singles who have found meaningful relationships. Your love story starts here.
               </p>
-            </Col>
-            <Col md={4} className="text-md-end">
-              <Link to="/signup" className="btn btn-primary btn-lg px-4">
-                Join Now
-              </Link>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </div>
+              {!user ? (
+                <div className="d-flex gap-3 justify-content-center flex-wrap">
+                  <Link to="/signup">
+                    <Button variant="dark" size="lg" className="px-4">
+                      Start Your Journey
+                    </Button>
+                  </Link>
+                  <Link to="/venues">
+                    <Button variant="outline-dark" size="lg" className="px-4">
+                      Explore Venues
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="d-flex gap-3 justify-content-center flex-wrap">
+                  <Link to="/matching">
+                    <Button variant="dark" size="lg" className="px-4">
+                      Find Your Match
+                    </Button>
+                  </Link>
+                  <Link to="/dashboard">
+                    <Button variant="outline-dark" size="lg" className="px-4">
+                      View Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Admin Access */}
+      <Row>
+        <Col className="text-center">
+          <small className="text-muted">
+            Platform Administrator? 
+            <Link to="/admin-login" className="text-decoration-none ms-2">
+              Admin Access
+            </Link>
+          </small>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
 export default Home;
-
-

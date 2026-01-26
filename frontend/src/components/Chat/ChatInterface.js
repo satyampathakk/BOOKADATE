@@ -155,10 +155,10 @@ const ChatInterface = () => {
     <Container className="mt-4">
       <Row>
         <Col md={12}>
-          <Card>
-            <Card.Header>
+          <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
+            <Card.Header style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #e0e0e0' }}>
               <div className="d-flex justify-content-between align-items-center">
-                <h4>Chat Interface</h4>
+                <h4 style={{ color: '#000' }}>Chat Interface</h4>
                 <div>
                   <Badge 
                     bg={
@@ -194,9 +194,10 @@ const ChatInterface = () => {
                       </Form.Text>
                     </Form.Group>
                     <Button 
-                      variant="primary" 
+                      variant="dark" 
                       type="submit"
                       disabled={!otherUserId}
+                      style={{ backgroundColor: '#000', borderColor: '#000' }}
                     >
                       Create Chat Session
                     </Button>
@@ -217,8 +218,11 @@ const ChatInterface = () => {
                             className={`d-flex mb-2 ${msg.sender_id === user?.id ? 'justify-content-end' : 'justify-content-start'}`}
                           >
                             <div 
-                              className={`p-2 rounded ${msg.sender_id === user?.id ? 'bg-primary text-white' : 'bg-secondary text-white'}`}
-                              style={{ maxWidth: '70%' }}
+                              className={`p-2 rounded ${msg.sender_id === user?.id ? 'text-white' : 'text-white'}`}
+                              style={{ 
+                                maxWidth: '70%',
+                                backgroundColor: msg.sender_id === user?.id ? '#000' : '#6c757d'
+                              }}
                             >
                               <div className="small text-muted mb-1">
                                 {msg.sender_id === user?.id ? 'You' : `User ${msg.sender_id}`}
@@ -245,10 +249,11 @@ const ChatInterface = () => {
                       disabled={!isConnected}
                     />
                     <Button 
-                      variant="primary" 
+                      variant="dark" 
                       className="ms-2" 
                       onClick={sendMessage}
                       disabled={!isConnected || !newMessage.trim()}
+                      style={{ backgroundColor: '#000', borderColor: '#000' }}
                     >
                       Send
                     </Button>
@@ -256,16 +261,18 @@ const ChatInterface = () => {
                   
                   <div className="mt-2 d-flex justify-content-between">
                     <Button 
-                      variant="success" 
+                      variant="outline-dark" 
                       onClick={connectToChat}
                       disabled={isConnected || !sessionId}
+                      style={{ borderColor: '#000', color: '#000' }}
                     >
                       Connect
                     </Button>
                     <Button 
-                      variant="danger" 
+                      variant="outline-dark" 
                       onClick={disconnectFromChat}
                       disabled={!isConnected}
+                      style={{ borderColor: '#000', color: '#000' }}
                     >
                       Disconnect
                     </Button>

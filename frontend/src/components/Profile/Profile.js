@@ -129,14 +129,14 @@ const Profile = () => {
     <Container className="mt-4">
       <Row>
         <Col md={12}>
-          <h2>My Profile</h2>
+          <h2 style={{ color: '#000' }}>My Profile</h2>
           <Tabs 
             activeKey={activeTab} 
             onSelect={(k) => k && setActiveTab(k)}
             className="mb-3"
           >
             <Tab eventKey="profile" title="Profile">
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   {message && <Alert variant="success">{message}</Alert>}
                   {error && <Alert variant="danger">{error}</Alert>}
@@ -197,7 +197,7 @@ const Profile = () => {
                       />
                     </Form.Group>
                     
-                    <Button variant="primary" type="submit">
+                    <Button variant="dark" type="submit" style={{ backgroundColor: '#000', borderColor: '#000' }}>
                       Update Profile
                     </Button>
                   </Form>
@@ -206,7 +206,7 @@ const Profile = () => {
             </Tab>
             
             <Tab eventKey="preferences" title="Preferences">
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   {message && <Alert variant="success">{message}</Alert>}
                   {error && <Alert variant="danger">{error}</Alert>}
@@ -272,7 +272,7 @@ const Profile = () => {
                       />
                     </Form.Group>
                     
-                    <Button variant="primary" type="submit">
+                    <Button variant="dark" type="submit" style={{ backgroundColor: '#000', borderColor: '#000' }}>
                       Update Preferences
                     </Button>
                   </Form>

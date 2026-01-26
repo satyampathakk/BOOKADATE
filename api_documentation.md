@@ -216,15 +216,18 @@ Authorization: Bearer <token>
 
 #### List Registrations
 ```
-GET /admin/registrations?status=pending
+POST /admin/registrations
 ```
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "admin@example.com",
-  "password": "SuperSecret123"
+  "password": "SuperSecret123",
+  "status": "pending"
 }
 ```
+**Note:** The `status` field is optional. Omit it to get all registrations.
+
 **Response:**
 ```json
 [
@@ -248,9 +251,9 @@ GET /admin/registrations?status=pending
 
 #### Get Registration Details
 ```
-GET /admin/registrations/{user_id}
+POST /admin/registrations/{user_id}
 ```
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "admin@example.com",

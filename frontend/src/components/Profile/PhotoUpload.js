@@ -15,7 +15,7 @@ const PhotoUpload = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      
+
       // Create a preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -51,31 +51,31 @@ const PhotoUpload = () => {
             <Card.Body>
               {message && <Alert variant="success">{message}</Alert>}
               {error && <Alert variant="danger">{error}</Alert>}
-              
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formFile">
                   <Form.Label>Select a photo</Form.Label>
-                  <Form.Control 
-                    type="file" 
+                  <Form.Control
+                    type="file"
                     accept="image/*"
-                    onChange={handleFileChange} 
+                    onChange={handleFileChange}
                   />
                 </Form.Group>
-                
+
                 {previewUrl && (
                   <div className="mb-3">
                     <h6>Preview:</h6>
-                    <img 
-                      src={previewUrl} 
-                      alt="Preview" 
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
                       style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }}
                     />
                   </div>
                 )}
-                
-                <Button 
-                  variant="primary" 
-                  type="submit" 
+
+                <Button
+                  variant="primary"
+                  type="submit"
                   disabled={!selectedFile || loading}
                 >
                   {loading ? 'Uploading...' : 'Upload Photo'}

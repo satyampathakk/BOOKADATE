@@ -1,7 +1,7 @@
 import React from 'react';
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown, Badge } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
-import { LinkContainer } from 'react-router-bootstrap';
 
 const Navigation = () => {
   const { user, logout } = useUser();
@@ -11,73 +11,76 @@ const Navigation = () => {
   };
 
   return (
-    <Navbar bg="primary" variant="dark" expand="lg" sticky="top">
+    <Navbar bg="white" expand="lg" sticky="top" className="shadow-sm border-bottom">
       <Container>
-        <LinkContainer to="/">
-          <Navbar.Brand>BlindDate</Navbar.Brand>
-        </LinkContainer>
+        <Link to="/" className="navbar-brand fw-bold" style={{ color: '#7c3aed', fontWeight: '800' }}>
+          BlindDate
+        </Link>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <LinkContainer to="/">
-              <Nav.Link>Home</Nav.Link>
-            </LinkContainer>
+            <Link to="/" className="nav-link" style={{ color: '#333', fontWeight: '600' }}>Home</Link>
+            <Link to="/venues" className="nav-link" style={{ color: '#333', fontWeight: '600' }}>Venues</Link>
 
-            {user ? (
+            {user && user.role !== 'admin' ? (
               <>
-                <LinkContainer to="/dashboard">
-                  <Nav.Link>Dashboard</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/find-matches">
-                  <Nav.Link>Find Matches</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/booking">
-                  <Nav.Link>Bookings</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/venues">
-                  <Nav.Link>Venues</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/chat">
-                  <Nav.Link>Chat</Nav.Link>
-                </LinkContainer>
+                <Link to="/dashboard" className="nav-link" style={{ color: '#333', fontWeight: '600' }}>Dashboard</Link>
+                <Link to="/matching" className="nav-link" style={{ color: '#333', fontWeight: '600' }}>Find Matches</Link>
+                <Link to="/bookings" className="nav-link" style={{ color: '#333', fontWeight: '600' }}>Bookings</Link>
+                <Link to="/chat" className="nav-link text-dark">Chat</Link>
               </>
-            ) : (
-              <>
-                <LinkContainer to="/login">
-                  <Nav.Link>Login</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/signup">
-                  <Nav.Link>Sign Up</Nav.Link>
-                </LinkContainer>
-              </>
-            )}
+            ) : null}
           </Nav>
 
           {user ? (
             <Nav>
-              <NavDropdown title={`Hello, ${user.name || user.email}`} id="basic-nav-dropdown">
-                <LinkContainer to="/profile">
-                  <NavDropdown.Item>Profile</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/matching-preferences">
-                  <NavDropdown.Item>Match Preferences</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/photo-upload">
-                  <NavDropdown.Item>Upload Photo</NavDropdown.Item>
-                </LinkContainer>
-                <LinkContainer to="/face-auth">
-                  <NavDropdown.Item>Face Authentication</NavDropdown.Item>
-                </LinkContainer>
-                <NavDropdown.Divider />
-                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+              {user.role === 'admin' && (
+                <Link to="/admin" className="nav-link fw-bold text-primary">
+                  Admin Panel
+                </Link>
+              )}
+              <NavDropdown 
+                title={
+                  <span className="text-dark">
+                    {user.name || user.email}
+                    {user.registration_status === 'pending' && (
+                      <Badge bg="warning" className="ms-1">Pending</Badge>
+                    )}
+                    {user.role === 'admin' && (
+                      <Badge bg="primary" className="ms-1">Admin</Badge>
+                    )}
+                  </span>
+                } 
+                id="user-nav-dropdown"
+                align="end"
+              >
+                {user.role !== 'admin' && (
+                  <>
+                    <Link to="/profile" className="dropdown-item">Profile</Link>
+                    <Link to="/matching-preferences" className="dropdown-item">Preferences</Link>
+                    <Link to="/photo-upload" className="dropdown-item">Upload Photo</Link>
+                    <NavDropdown.Divider />
+                  </>
+                )}
+                {user.role === 'admin' && (
+                  <>
+                    <Link to="/admin" className="dropdown-item">Admin Dashboard</Link>
+                    <NavDropdown.Divider />
+                  </>
+                )}
+                <NavDropdown.Item onClick={handleLogout} className="text-danger">
+                  Logout
+                </NavDropdown.Item>
               </NavDropdown>
             </Nav>
           ) : (
             <Nav>
-              <LinkContainer to="/login">
-                <Nav.Link>Login</Nav.Link>
-              </LinkContainer>
+              <Link to="/login" className="btn btn-outline-dark me-2">Login</Link>
+              <Link to="/signup" className="btn btn-dark">Sign Up</Link>
+              <NavDropdown title={<span className="text-dark">Admin</span>} id="admin-nav-dropdown" align="end">
+                <Link to="/admin-login" className="dropdown-item">Admin Login</Link>
+              </NavDropdown>
             </Nav>
           )}
         </Navbar.Collapse>

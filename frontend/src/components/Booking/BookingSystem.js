@@ -208,7 +208,7 @@ const BookingSystem = () => {
     <Container className="mt-4">
       <Row>
         <Col md={12}>
-          <h2>Booking System</h2>
+          <h2 style={{ color: '#000' }}>Booking System</h2>
           
           {message && <Alert variant="success">{message}</Alert>}
           
@@ -218,7 +218,7 @@ const BookingSystem = () => {
             className="mb-3"
           >
             <Tab eventKey="select" title="Select Match">
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   <h4>Select a Match to Book</h4>
                   <p>Choose from your matches to schedule a blind date.</p>
@@ -243,12 +243,13 @@ const BookingSystem = () => {
                               <p className="mb-0">Matched at: {new Date(match.matched_at).toLocaleString()}</p>
                             </div>
                             <Button 
-                              variant="primary"
+                              variant="dark"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedMatch(match.id);
                                 handleCreateBooking();
                               }}
+                              style={{ backgroundColor: '#000', borderColor: '#000' }}
                             >
                               Book Date
                             </Button>
@@ -262,7 +263,7 @@ const BookingSystem = () => {
             </Tab>
             
             <Tab eventKey="venue" title="Select Venue" disabled={bookingStep !== 'venue'}>
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   <h4>Select a Venue</h4>
                   <p>Pick a venue and propose it to your match.</p>
@@ -283,7 +284,7 @@ const BookingSystem = () => {
                   <Row>
                     {venues.map((venue) => (
                       <Col md={4} className="mb-3" key={venue.id}>
-                        <Card className={`h-100 ${selectedVenueId === venue.id ? 'border-primary' : ''}`}>
+                        <Card className={`h-100 ${selectedVenueId === venue.id ? 'border-dark' : ''}`} style={{ backgroundColor: '#fff', border: selectedVenueId === venue.id ? '2px solid #000' : '1px solid #e0e0e0' }}>
                           <Card.Body>
                             <Card.Title>{venue.name}</Card.Title>
                             <Card.Text className="mb-1">City: {venue.city}</Card.Text>
@@ -292,19 +293,21 @@ const BookingSystem = () => {
                             <Card.Text className="mb-2">Capacity: {venue.capacity || 'N/A'}</Card.Text>
                             <div className="d-flex gap-2 flex-wrap">
                               <Button 
-                                variant={selectedVenueId === venue.id ? 'primary' : 'outline-primary'}
+                                variant={selectedVenueId === venue.id ? 'dark' : 'outline-dark'}
                                 size="sm"
                                 onClick={() => setSelectedVenueId(venue.id)}
+                                style={selectedVenueId === venue.id ? { backgroundColor: '#000', borderColor: '#000' } : { borderColor: '#000', color: '#000' }}
                               >
                                 {selectedVenueId === venue.id ? 'Selected' : 'Select'}
                               </Button>
                               <Button
-                                variant="success"
+                                variant="dark"
                                 size="sm"
                                 onClick={() => {
                                   setSelectedVenueId(venue.id);
                                   handleProposeVenue();
                                 }}
+                                style={{ backgroundColor: '#000', borderColor: '#000' }}
                               >
                                 Propose
                               </Button>
@@ -322,7 +325,7 @@ const BookingSystem = () => {
             </Tab>
             
             <Tab eventKey="time" title="Select Time" disabled={bookingStep !== 'time'}>
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   <h4>Select Time</h4>
                   <p>Pick a date and time, then propose it to your match.</p>
@@ -351,10 +354,10 @@ const BookingSystem = () => {
                   </Row>
 
                   <div className="d-flex gap-2 mb-3 flex-wrap">
-                    <Button variant="outline-primary" onClick={handleFetchAvailableTimes}>
+                    <Button variant="outline-dark" onClick={handleFetchAvailableTimes} style={{ borderColor: '#000', color: '#000' }}>
                       Check Available Times for Venue #{selectedVenueId || '...'}
                     </Button>
-                    <Button variant="primary" onClick={handleProposeTime}>
+                    <Button variant="dark" onClick={handleProposeTime} style={{ backgroundColor: '#000', borderColor: '#000' }}>
                       Propose Time
                     </Button>
                   </div>
@@ -384,15 +387,16 @@ const BookingSystem = () => {
             </Tab>
             
             <Tab eventKey="confirm" title="Confirm Booking" disabled={!selectedBooking || selectedBooking.status !== 'both_approved'}>
-              <Card>
+              <Card style={{ backgroundColor: '#fff', border: '1px solid #e0e0e0' }}>
                 <Card.Body>
                   <h4>Confirm Booking</h4>
                   <p>Review and confirm once venue and time are approved by both users.</p>
                   <div className="d-flex gap-2 flex-wrap">
                     <Button 
-                      variant="primary" 
+                      variant="dark" 
                       disabled={!selectedBooking || selectedBooking.status !== 'both_approved'}
                       onClick={() => selectedBooking && handleConfirmBooking(selectedBooking.id)}
+                      style={{ backgroundColor: '#000', borderColor: '#000' }}
                     >
                       Confirm Booking #{selectedBooking ? selectedBooking.id : ''}
                     </Button>
@@ -406,7 +410,7 @@ const BookingSystem = () => {
       
       <Row className="mt-4">
         <Col md={12}>
-          <h3>My Bookings</h3>
+          <h3 style={{ color: '#000' }}>My Bookings</h3>
           {bookings.length === 0 ? (
             <Alert variant="info">
               You don't have any bookings yet.
